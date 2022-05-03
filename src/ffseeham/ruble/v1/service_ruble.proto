@@ -1,0 +1,280 @@
+// RuBlE - FF-Seeham's Blog Editor written in Rust
+// Copyright 2022 FF-Seeham. https://ff-seeham.at
+//
+// SPDX-License-Identifier: MIT
+syntax = "proto3";
+
+package ffseeham.ruble.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// The ruble service provides access to the blog's entries and allows
+// modification of them as well as deletion of existing and creation of new
+// entries.
+service RubleService {
+  // Get a list of all available blog entries
+  rpc ListBlogEntries(ListBlogEntriesRequest) returns (ListBlogEntriesResponse);
+
+  // Get a specific blog entry
+  rpc GetBlogEntry(GetBlogEntryRequest) returns (GetBlogEntryResponse);
+
+  // Create a new blog entry
+  rpc CreateBlogEntry(CreateBlogEntryRequest) returns (CreateBlogEntryResponse);
+
+  // Edit/Overwrite an existing blog entry
+  rpc EditBlogEntry(EditBlogEntryRequest) returns (EditBlogEntryResponse);
+
+  // Delete an existing blog entry
+  rpc DeleteBlogEntry(DeleteBlogEntryRequest) returns (DeleteBlogEntryResponse);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Request and Response messages
+//
+
+// Request message for getting a list of all available blog entries
+message ListBlogEntriesRequest {
+  // Maximum number of entries to include in the response.
+  // Requesta all if not given.
+  optional uint32 max_entries = 1;
+}
+
+// Response message for getting a list of all available blog entries
+message ListBlogEntriesResponse {
+  // IDs of the requested blog entries.
+  repeated string ids = 1;
+}
+
+// Request for getting a specific blog entry
+message GetBlogEntryRequest {
+  // ID of the requested blog entry.
+  string id = 1;
+}
+
+// Response for getting a specific blog entry
+message GetBlogEntryResponse {}
+
+// Request for creating a new blog entry
+message CreateBlogEntryRequest {}
+
+// Response for creating a new blog entry
+message CreateBlogEntryResponse {}
+
+// Request message for editing/overwriting an existing blog entry
+message EditBlogEntryRequest {}
+
+// Response message for editing/overwriting an existing blog entry
+message EditBlogEntryResponse {}
+
+// Request message for deleting an existing blog entry
+message DeleteBlogEntryRequest {}
+
+// Response message for deleting an existing blog entry
+message DeleteBlogEntryResponse {}
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource messages
+//
+
+// Non-operation specific data of a blog entry.
+message GenericEntryData {
+  // Category of the blog entry
+  GenericEntryCategory category = 1;
+
+  // Generic tag for the entry.
+  // Not evaluated if category is OPERATION.
+  GenericEntryTag tag = 2;
+}
+
+// A unit/force deployed for an operation
+message OperationForce {
+  // Force identifier
+  ForceId id = 1;
+
+  // Crew size aka Mannschaftsstärke
+  uint32 crew_size = 2;
+
+  // Vehicles
+  repeated string vehicles = 3;
+}
+
+// Operation specific data of a blog entry.
+message OperationEntryData {
+  // Operation type for the entry.
+  OperationType type = 1;
+
+  // Operation level for the entry.
+  OperationLevel level = 2;
+
+  // Operation location
+  string location = 3;
+
+  // Operation alarm timestamp
+  google.protobuf.Timestamp alarm_timestamp = 4;
+
+  // Operation end timestamp
+  google.protobuf.Timestamp end_timestamp = 5;
+
+  // Operation alarm type
+  repeated OperationAlarmType alarm_types = 6;
+
+  // Operation leader
+  string leader = 7;
+
+  // Deployed forces
+  repeated OperationForce forces = 8;
+}
+
+// A complete blog entry
+message BlogEntry {
+  // Id of the blog entry.
+  string id = 1;
+
+  // Publish timestamp of the blog entry.
+  google.protobuf.Timestamp publish_timestamp = 2;
+
+  // Title for the entry.
+  string entry_title = 3;
+
+  // Main text for the entry without the initial header.
+  string entry_text = 4;
+
+  // External hyperlinks
+  repeated string links = 5;
+
+  // Images/Photos
+  repeated bytes images = 6;
+
+  // Banner image ID
+  optional uint32 banner_img_id = 7;
+
+  // The entry data
+  oneof entry {
+    // Non-operation entry
+    GenericEntryData generic = 10;
+
+    // Operation entry
+    OperationEntryData operation = 11;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Enumerations
+//
+
+// Category a generic blog entry belongs to.
+enum GenericEntryCategory {
+  // No blog entry category specified.
+  BLOG_ENTRY_CATEGORY_UNSPECIFIED = 0;
+
+  // Entry of a drill aka Übung/Appell.
+  DRILL = 1;
+
+  // Entry of the fire-brigade-youths aka Feuerwehrjugend.
+  YOUTH = 2;
+
+  // Entry of the basis construction aka Neubau Zeugstätte.
+  CONSTRUCTION = 3;
+
+  // Entry of a various event aka Diverses.
+  VARIOUS = 4;
+}
+
+// More precise tag a youth or various blog entry belongs to.
+enum GenericEntryTag {
+  // No various entry type specified.
+  GENERIC_ENTRY_TAG_UNSPECIFIED = 0;
+
+  // Event aka Veranstaltung.
+  EVENT = 1;
+
+  // Competition aka Bewerb.
+  COMPETITION = 2;
+
+  // Information
+  INFORMATION = 3;
+}
+
+// Type of an operation.
+enum OperationType {
+  // No operation type specified.
+  OPERATION_TYPE_UNSPECIFIED = 0;
+
+  // Brandeinsatz
+  FIRE = 1;
+
+  // Technischer Einsatz
+  TECHNICAL = 2;
+
+  // Assistenzeinsatz
+  ASSISTANCE = 3;
+}
+
+// Deployment level of an operation.
+enum OperationLevel {
+  // No operation level specified.
+  OPERATION_LEVEL_UNSPECIFIED = 0;
+
+  // Operation level aka Alarmstufe 1
+  OL_1 = 1;
+
+  // Operation level aka Alarmstufe 2
+  OL_2 = 2;
+
+  // Operation level aka Alarmstufe 3
+  OL_3 = 3;
+}
+
+// Operation alarm types.
+enum OperationAlarmType {
+  // No operation alarm type specified.
+  OPERATION_ALARM_TYPE_UNSPECIFIED = 0;
+
+  // Siren
+  SIREN = 1;
+
+  // Digital pager
+  PAGER = 2;
+
+  // BlaulichtSMS
+  BLAULICHT_SMS = 3;
+
+  // Telephone
+  TELEPHONE = 4;
+
+  // Personally
+  PERSONALLY = 5;
+}
+
+// Identifiers of well-known forces/units
+enum ForceId {
+  // No force specified
+  FORCE_ID_UNSPECIFIED = 0;
+
+  // Freiwillige Feuerwehr Seeham
+  FF_SEEHAM = 1;
+
+  // Freiwillige Feuerwehr Berndorf
+  FF_BERNDORF = 2;
+
+  // Freiwillige Feuerwehr Mattsee
+  FF_MATTSEE = 3;
+
+  // Freiwillige Feuerwehr Obertrum
+  FF_OBERTRUM = 4;
+
+  // Freiwillige Feuerwehr Seekirchen
+  FF_SEEKIRCHEN = 5;
+
+  // Freiwillige Feuerwehr Eugendorf
+  FF_EUGENDORF = 6;
+
+  // Österreichisches Rotes Kreuz
+  ORK = 100;
+
+  // Polizei
+  POLIZEI = 101;
+
+  // Bundesheer
+  BUNDESHEER = 102;
+}

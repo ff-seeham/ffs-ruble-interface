@@ -1,0 +1,11 @@
+version: v1
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - PACKAGE_NO_IMPORT_CYCLE
+  except:
+    - ENUM_VALUE_PREFIX
+breaking:
+  use:
+    - FILE
