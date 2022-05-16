@@ -67,13 +67,20 @@ message CreateBlogEntryRequest {
 message CreateBlogEntryResponse {}
 
 // Request message for editing/overwriting an existing blog entry
-message EditBlogEntryRequest {}
+message EditBlogEntryRequest {
+  // Edited blog entry.
+  // The id of this entry must exist and will be overwritten.
+  BlogEntry entry = 1;
+}
 
 // Response message for editing/overwriting an existing blog entry
 message EditBlogEntryResponse {}
 
 // Request message for deleting an existing blog entry
-message DeleteBlogEntryRequest {}
+message DeleteBlogEntryRequest {
+  // ID of the blog entry which should be deleted.
+  string id = 1;
+}
 
 // Response message for deleting an existing blog entry
 message DeleteBlogEntryResponse {}
