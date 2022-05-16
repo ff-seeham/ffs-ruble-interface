@@ -52,10 +52,16 @@ message GetBlogEntryRequest {
 }
 
 // Response for getting a specific blog entry
-message GetBlogEntryResponse {}
+message GetBlogEntryResponse {
+  // Requested blog entry
+  BlogEntry entry = 1;
+}
 
 // Request for creating a new blog entry
-message CreateBlogEntryRequest {}
+message CreateBlogEntryRequest {
+  // Blog entry to create
+  BlogEntry entry = 1;
+}
 
 // Response for creating a new blog entry
 message CreateBlogEntryResponse {}
